@@ -1,7 +1,7 @@
-const express = require("express");
-const cors = require("cors");
-const { initializeApp } = require("firebase/app");
-const {
+import express from "express";
+import cors from "cors";
+import { initializeApp } from "firebase/app";
+import {
   getFirestore,
   collection,
   query,
@@ -11,12 +11,12 @@ const {
   where,
   getDocs,
   writeBatch,
-} = require("firebase/firestore");
-import { Timestamp } from "firebase/firestore";
+  Timestamp,
+} from "firebase/firestore";
+import fetch from "node-fetch";
 
 const getCurrentTime = () => {
-  const now = Timestamp.now();
-  return now;
+  return Timestamp.now();
 };
 
 const app = express();
