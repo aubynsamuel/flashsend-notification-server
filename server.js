@@ -12,8 +12,12 @@ const {
   getDocs,
   writeBatch,
 } = require("firebase/firestore");
+import { Timestamp } from "firebase/firestore";
 
-const getCurrentTime = () => Date.now();
+const getCurrentTime = () => {
+  const now = Timestamp.now();
+  return now;
+};
 
 const app = express();
 const port = process.env.PORT || 3000;
