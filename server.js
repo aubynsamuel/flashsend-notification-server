@@ -65,7 +65,8 @@ async function sendNotification(
   body,
   roomId,
   recipientsUserId,
-  sendersUserId
+  sendersUserId,
+  profileUrl
 ) {
   const message = {
     to: recipientsToken,
@@ -75,6 +76,7 @@ async function sendNotification(
       recipientsUserId,
       sendersUserId,
       roomId,
+      profileUrl,
     },
     sound: "default",
     priority: "high",
@@ -146,7 +148,8 @@ app.post("/api/reply", async (req, res) => {
         replyText,
         roomId,
         recipientsUserId,
-        sendersUserId
+        sendersUserId,
+        recipient.profileUrl
       );
     }
 
