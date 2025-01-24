@@ -149,7 +149,7 @@ app.post("/api/reply", async (req, res) => {
         roomId,
         recipientsUserId,
         sendersUserId,
-        recipient.profileUrl
+        sender.profileUrl
       );
     }
 
