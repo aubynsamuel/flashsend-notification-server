@@ -13,18 +13,15 @@ import {
   writeBatch,
   Timestamp,
 } from "firebase/firestore";
-import fetch from "node-fetch";
+import admin from "firebase-admin";
+import serviceAccount from "./serviceAccountKey.json"; // Update path as needed
 
-const getCurrentTime = () => {
-  return Timestamp.now();
-};
+// Initialize Firebase Admin SDK
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount),
+});
 
-const app = express();
-const port = process.env.PORT || 3000;
-
-app.use(cors());
-app.use(express.json());
-
+// Your existing Firebase client initialization (for Firestore, etc.)
 const firebaseConfig = {
   apiKey: "AIzaSyDWpxeyrLdC_Wd2yIUHfyYRNLlyMt4e9fk",
   authDomain: "flash-send-11.firebaseapp.com",
@@ -33,9 +30,18 @@ const firebaseConfig = {
   messagingSenderId: "407192831525",
   appId: "1:407192831525:android:6777825190b3aa59b6a1cc",
 };
-
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(cors());
+app.use(express.json());
+
+const getCurrentTime = () => {
+  return Timestamp.now();
+};
 
 // Helper function to fetch user details
 async function getUserDetails(userId) {
@@ -59,6 +65,18 @@ async function getUserDetails(userId) {
   }
 }
 
+/**
+ * Send a notification using Firebase Cloud Messaging (FCM) via the Admin SDK.
+ *
+ * @param {string} recipientsToken - The device token of the recipient.
+ * @param {string} title - The notification title.
+ * @param {string} body - The notification body.
+ * @param {string} roomId - The room identifier.
+ * @param {string} recipientsUserId - The recipient’s user ID.
+ * @param {string} sendersUserId - The sender’s user ID.
+ * @param {string} profileUrl - The sender’s profile URL.
+ * @returns {Promise<string|null>} The FCM message ID or null if sending failed.
+ */
 async function sendNotification(
   recipientsToken,
   title,
@@ -68,32 +86,32 @@ async function sendNotification(
   sendersUserId,
   profileUrl
 ) {
+  // Build the FCM message
   const message = {
-    to: recipientsToken,
-    title,
-    body: body.length < 100 ? body : body.substring(0, 100) + "...",
-    data: {
-      recipientsUserId,
-      sendersUserId,
-      roomId,
-      profileUrl,
+    token: recipientsToken,
+    notification: {
+      title,
+      body: body.length < 100 ? body : body.substring(0, 100) + "...",
     },
-    sound: "default",
-    priority: "high",
-    channelId: "fcm_fallback_notification_channel",
+    data: {
+      recipientsUserId: recipientsUserId.toString(),
+      sendersUserId: sendersUserId.toString(),
+      roomId: roomId.toString(),
+      profileUrl: profileUrl.toString(),
+    },
+    android: {
+      priority: "high",
+      notification: {
+        sound: "default",
+        channelId: "flash",
+      },
+    },
   };
 
   try {
-    const response = await fetch("https://exp.host/--/api/v2/push/send", {
-      method: "POST",
-      headers: {
-        Accept: "application/json",
-        "Accept-encoding": "gzip, deflate",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(message),
-    });
-    return await response.json();
+    const response = await admin.messaging().send(message);
+    console.log("Successfully sent message:", response);
+    return response;
   } catch (error) {
     console.error("Failed to send notification:", error);
     return null;
