@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
+import serviceAccount from "./serviceAccountKey.json";
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
