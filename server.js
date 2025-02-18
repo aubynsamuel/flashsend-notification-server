@@ -14,7 +14,7 @@ import {
   Timestamp,
 } from "firebase/firestore";
 import admin from "firebase-admin";
-import serviceAccount from "./serviceAccountKey.json"; // Update path as needed
+import serviceAccount from "./serviceAccountKey.json" assert { type: "json" };
 
 // Initialize Firebase Admin SDK
 admin.initializeApp({
@@ -30,6 +30,7 @@ const firebaseConfig = {
   messagingSenderId: "407192831525",
   appId: "1:407192831525:android:6777825190b3aa59b6a1cc",
 };
+
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
 
@@ -89,22 +90,24 @@ async function sendNotification(
   // Build the FCM message
   const message = {
     token: recipientsToken,
-    notification: {
-      title,
-      body: body.length < 100 ? body : body.substring(0, 100) + "...",
-    },
+    // notification: {
+    //   title,
+    //   body: body,
+    // },
     data: {
-      recipientsUserId: recipientsUserId.toString(),
-      sendersUserId: sendersUserId.toString(),
-      roomId: roomId.toString(),
-      profileUrl: profileUrl.toString(),
+      title,
+      body: body,
+      recipientsUserId: recipientsUserId,
+      sendersUserId: sendersUserId,
+      roomId: roomId,
+      profileUrl: profileUrl,
     },
     android: {
       priority: "high",
-      notification: {
-        sound: "default",
-        channelId: "flash",
-      },
+      // notification: {
+      //   sound: "default",
+      //   channelId: "flash",
+      // },
     },
   };
 
@@ -117,6 +120,34 @@ async function sendNotification(
     return null;
   }
 }
+
+app.post("/api/sendNotification", async (req, res) => {
+  const {
+    recipientsToken,
+    title,
+    body,
+    roomId,
+    recipientsUserId,
+    sendersUserId,
+    profileUrl,
+  } = req.body;
+  try {
+    await sendNotification(
+      recipientsToken,
+      title,
+      body,
+      roomId,
+      recipientsUserId,
+      sendersUserId,
+      profileUrl
+    );
+    res
+      .status(200)
+      .json({ success: true, message: "Notification sent successfully" });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 app.post("/api/reply", async (req, res) => {
   const { sendersUserId, recipientsUserId, roomId, replyText } = req.body;
