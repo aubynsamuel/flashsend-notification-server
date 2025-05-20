@@ -1,6 +1,6 @@
-# FlashSend Server
+# FlashSend Notification Server
 
-A lightweight Node.js server for FlashSend that handles chat notifications using cloud messaging Firebase
+A lightweight Node.js server for FlashSend that handles chat notifications using Firebase Cloud Messaging
 
 ---
 
@@ -19,8 +19,8 @@ A lightweight Node.js server for FlashSend that handles chat notifications using
 1.  **Clone the Repository**
 
     ```bash
-    git clone [https://github.com/yourusername/flashsend-server.git](https://github.com/yourusername/flashsend-server.git)
-    cd flashsend-server
+    git clone https://github.com/aubynsamuel/flashsend-notification-server
+    cd flashsend-notification-server
     ```
 
 2.  **Install Dependencies**
@@ -28,8 +28,13 @@ A lightweight Node.js server for FlashSend that handles chat notifications using
     ```bash
     npm install
     ```
+    or
+    
+    ```bash
+    yarn
+    ```
 
-3.  **Add Firebase Credentials**
+4.  **Add Firebase Credentials**
 
     * **Admin SDK**: Place your service account JSON file as `serviceAccountKey.json` in the project's root directory.
     * **Client SDK**: Create a file named `src/firebaseConfig.ts` and export your Firebase configuration:
@@ -43,11 +48,11 @@ A lightweight Node.js server for FlashSend that handles chat notifications using
         }
         ```
 
-4.  **Environment**
+5.  **Environment**
 
     Ensure the **PORT** environment variable is set if you don't want to use the default port `3000`.
 
-5.  **Run the Server**
+6.  **Run the Server**
 
     ```bash
     npm run dev
@@ -56,7 +61,7 @@ A lightweight Node.js server for FlashSend that handles chat notifications using
     or
 
     ```bash
-    npm start
+    yarn dev
     ```
 
 ---
