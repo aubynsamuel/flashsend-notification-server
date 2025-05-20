@@ -1,6 +1,6 @@
 # FlashSend Server
 
-A lightweight Node.js server for FlashSend that handles chat notifications and message syncing using Firebase.
+A lightweight Node.js server for FlashSend that handles chat notifications using cloud messaging Firebase
 
 ---
 
