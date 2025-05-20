@@ -15,7 +15,7 @@ import {
 } from "firebase/firestore";
 import { firebaseConfig } from "./firebaseConfig";
 import admin, { ServiceAccount } from "firebase-admin";
-import { serviceAccount } from "./serviceAccountKey";
+import serviceAccount from "../serviceAccountKey.json";
 
 interface MessageInterface {
   token: string;

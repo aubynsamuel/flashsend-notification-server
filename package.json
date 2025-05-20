@@ -7,7 +7,7 @@
     "dev": "ts-node src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
-    "prod": "yarn build && yarn start"
+    "prod": "npm run build && npm run start"
   },
   "dependencies": {
     "cors": "^2.8.5",
