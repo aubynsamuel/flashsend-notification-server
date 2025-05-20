@@ -13,28 +13,30 @@ import {
   writeBatch,
   Timestamp,
 } from "firebase/firestore";
-import admin from "firebase-admin";
+import { firebaseConfig } from "./firebaseConfig";
+import admin, { ServiceAccount } from "firebase-admin";
+import { serviceAccount } from "./serviceAccountKey";
 
-import fs from "fs";
-
-const serviceAccount = JSON.parse(
-  fs.readFileSync("./serviceAccountKey.json", "utf8")
-);
+interface MessageInterface {
+  token: string;
+  data: {
+    title: string;
+    body: string;
+    recipientsUserId: string;
+    sendersUserId: string;
+    roomId: string;
+    profileUrl: string;
+  };
+  android: {
+    priority: "high" | "normal" | undefined;
+  };
+}
 
 // Initialize Firebase Admin SDK
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount),
-});
 
-// Your existing Firebase client initialization (for Firestore, etc.)
-const firebaseConfig = {
-  apiKey: "AIzaSyDWpxeyrLdC_Wd2yIUHfyYRNLlyMt4e9fk",
-  authDomain: "flash-send-11.firebaseapp.com",
-  projectId: "flash-send-11",
-  storageBucket: "flash-send-11.appspot.com",
-  messagingSenderId: "407192831525",
-  appId: "1:407192831525:android:6777825190b3aa59b6a1cc",
-};
+admin.initializeApp({
+  credential: admin.credential.cert(serviceAccount as string | ServiceAccount),
+});
 
 const firebaseApp = initializeApp(firebaseConfig);
 const db = getFirestore(firebaseApp);
@@ -50,7 +52,7 @@ const getCurrentTime = () => {
 };
 
 // Helper function to fetch user details
-async function getUserDetails(userId) {
+async function getUserDetails(userId: string) {
   try {
     const userDocRef = doc(db, "users", userId);
     const userDoc = await getDoc(userDocRef);
@@ -72,13 +74,13 @@ async function getUserDetails(userId) {
 }
 
 async function sendNotificationWithENS(
-  recipientsToken,
-  title,
-  body,
-  roomId,
-  recipientsUserId,
-  sendersUserId,
-  profileUrl
+  recipientsToken: string,
+  title: string,
+  body: string,
+  roomId: string,
+  recipientsUserId: string,
+  sendersUserId: string,
+  profileUrl: string
 ) {
   const message = {
     to: recipientsToken,
@@ -125,21 +127,16 @@ async function sendNotificationWithENS(
  * @returns {Promise<string|null>} The FCM message ID or null if sending failed.
  */
 async function sendNotification(
-  recipientsToken,
-  title,
-  body,
-  roomId,
-  recipientsUserId,
-  sendersUserId,
-  profileUrl
-) {
-  // Build the FCM message
-  const message = {
+  recipientsToken: string,
+  title: string,
+  body: string,
+  roomId: string,
+  recipientsUserId: string,
+  sendersUserId: string,
+  profileUrl: string
+): Promise<string | null> {
+  const message: MessageInterface = {
     token: recipientsToken,
-    // notification: {
-    //   title,
-    //   body: body,
-    // },
     data: {
       title,
       body: body,
@@ -150,10 +147,6 @@ async function sendNotification(
     },
     android: {
       priority: "high",
-      // notification: {
-      //   sound: "default",
-      //   channelId: "flash",
-      // },
     },
   };
 
@@ -191,7 +184,7 @@ app.post("/api/sendNotification", async (req, res) => {
       .status(200)
       .json({ success: true, message: "Notification sent successfully" });
   } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: error });
   }
 });
 
@@ -263,7 +256,7 @@ app.post("/api/reply", async (req, res) => {
     res.status(200).json({ success: true, message: "Reply sent successfully" });
   } catch (error) {
     console.error("Error in reply endpoint:", error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: error });
   }
 });
 
@@ -299,12 +292,13 @@ app.post("/api/markAsRead", async (req, res) => {
     });
   } catch (error) {
     console.error("Error in markAsRead endpoint:", error);
-    res.status(500).json({ success: false, error: error.message });
+    res.status(500).json({ success: false, error: error });
   }
 });
 
 app.get("/health", (req, res) => {
   res.status(200).json({ status: "healthy" });
+  console.log("A device pinged me");
 });
 
 app.listen(port, () => {
