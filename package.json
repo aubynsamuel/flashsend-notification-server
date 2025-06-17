@@ -4,7 +4,7 @@
   "main": "src/server.ts",
   "license": "MIT",
   "scripts": {
-    "dev": "ts-node src/server.ts",
+    "dev": "nodemon src/server.ts",
     "build": "tsc",
     "start": "node dist/server.js",
     "prod": "npm run build && npm run start"
@@ -23,6 +23,7 @@
     "eslint": "^9.23.0",
     "eslint-plugin-react": "^7.37.4",
     "globals": "^16.0.0",
+    "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.2",
     "typescript-eslint": "^8.29.0"
